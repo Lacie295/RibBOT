@@ -115,7 +115,7 @@ def init(client):
 
     def secs():
         x = datetime.today()
-        x_temp = x.replace(hour=6, minute=0, second=0, microsecond=0)
+        x_temp = x.replace(hour=5, minute=0, second=0, microsecond=0)
         y = x_temp if x_temp > x else x_temp + timedelta(days=1)
         delta_t = y - x
         return delta_t.seconds + 1
