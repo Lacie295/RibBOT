@@ -97,8 +97,13 @@ def init(client):
             Usage: %set_channel"""
             m = context.message
             if m.author.guild_permissions.administrator:
-                cid = m.channel.id
-                gid = m.guild.id
+                if len(m.channel_mentions) == 1:
+                    channel = m.channel_mentions[0]
+                    cid = channel.id
+                    gid = channel.guild.id
+                else:
+                    cid = m.channel.id
+                    gid = m.guild.id
                 db_handler.set_channel(gid, cid)
                 await context.send("Successfully configured channel!")
             else:
