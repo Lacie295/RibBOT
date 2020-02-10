@@ -60,9 +60,9 @@ def init(client):
             m = context.message
             if m.author.guild_permissions.administrator:
                 split = m.content.split(" ")
-                if len(split) == 3:
-                    name = split[1]
-                    event_date = split[2]
+                if len(split) >= 3:
+                    name = " ".join(split[1:-1])
+                    event_date = split[-1]
                     try:
                         edate = datetime.strptime(event_date, "%d/%m/%Y").date()
                         db_handler.add_event(name, edate)
@@ -81,8 +81,8 @@ def init(client):
             m = context.message
             if m.author.guild_permissions.administrator:
                 split = m.content.split(" ")
-                if len(split) == 2:
-                    name = split[1]
+                if len(split) >= 2:
+                    name = " ".join(split[1:])
                     db_handler.remove_event(name)
                     await context.send("Removed event.")
                 else:
@@ -110,7 +110,7 @@ def init(client):
 
     def secs():
         x = datetime.today()
-        x_temp = x.replace(hour=15, minute=32, second=0, microsecond=0)
+        x_temp = x.replace(hour=6, minute=0, second=0, microsecond=0)
         y = x_temp if x_temp > x else x_temp + timedelta(days=1)
         delta_t = y - x
         return delta_t.seconds + 1
