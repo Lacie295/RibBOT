@@ -90,6 +90,19 @@ def init(client):
             else:
                 await context.send("You don't have permissions for that!")
 
+        @commands.command(pass_context=True)
+        async def list_events(self, context):
+            """Lists all events.
+            Usage: %list_events"""
+            m = context.message
+            if m.author.guild_permissions.administrator:
+                s = ""
+                for name in db_handler.db['events']:
+                    s += name + " - " + db_handler.get_event_date(name) + "\n"
+                await context.send(s)
+            else:
+                await context.send("You don't have permissions for that!")
+
     class Utility(commands.Cog):
         @commands.command(pass_context=True)
         async def set_channel(self, context):
@@ -121,8 +134,7 @@ def init(client):
         return delta_t.seconds + 1
 
     async def send_events():
-        s = secs()
-        AsyncTimer(s, send_events)
+        AsyncTimer(secs(), send_events)
 
         coming = ""
         now = ""
@@ -135,10 +147,12 @@ def init(client):
             today = date.today()
             delta = edate - today
             if delta.days == 0:
-                now += "Tapahtuma tänään: " + event + "\n"
+                now += ":star2: Tapahtuma tänään: " + event + " :star2:\n"
+                remove.append(event)
+            elif delta.days < 0:
                 remove.append(event)
             else:
-                coming += str(delta.days) + " päivää tapahtumaan: " + event + "\n"
+                coming += ":star2: " + str(delta.days) + " päivää tapahtumaan: " + event + " :star2:\n"
 
         for event in remove:
             db_handler.remove_event(event)
@@ -147,11 +161,11 @@ def init(client):
 
         birthdays = db_handler.get_birthdays(date.today())
         for name in birthdays:
-            s += "Tänään syntymäpäivää viettää " + name + "\n"
+            s += ":birthday: Tänään syntymäpäivää viettää " + name + " :birthday:\n"
 
         gid, cid = db_handler.get_channel()
         guild = client.get_guild(gid)
         channel = guild.get_channel(cid)
         await channel.send(s)
 
-    AsyncTimer(secs(), send_events)
+    AsyncTimer(10, send_events)

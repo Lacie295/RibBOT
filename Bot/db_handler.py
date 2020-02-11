@@ -82,7 +82,7 @@ def get_birthdays(date):
     if datestr in db['birthdays']:
         return db['birthdays'][datestr]
     else:
-        return None
+        return []
 
 
 def set_channel(gid, cid):
