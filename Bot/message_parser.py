@@ -168,4 +168,4 @@ def init(client):
         channel = guild.get_channel(cid)
         await channel.send(s)
 
-    AsyncTimer(10, send_events)
+    AsyncTimer(secs(), send_events)
