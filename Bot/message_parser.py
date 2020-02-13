@@ -147,12 +147,12 @@ def init(client):
             today = date.today()
             delta = edate - today
             if delta.days == 0:
-                now += ":star2: Tapahtuma tänään: " + event + " :star2:\n"
+                now += ":star2: Tapahtuma tänään: " + event + "\n"
                 remove.append(event)
             elif delta.days < 0:
                 remove.append(event)
             else:
-                coming += ":star2: " + str(delta.days) + " päivää tapahtumaan: " + event + " :star2:\n"
+                coming += ":star2: " + str(delta.days) + " päivää tapahtumaan: " + event + "\n"
 
         for event in remove:
             db_handler.remove_event(event)
@@ -161,7 +161,7 @@ def init(client):
 
         birthdays = db_handler.get_birthdays(date.today())
         for name in birthdays:
-            s += ":birthday: Tänään syntymäpäivää viettää " + name + " :birthday:\n"
+            s += ":birthday: Tänään syntymäpäivää viettää " + name + "\n"
 
         gid, cid = db_handler.get_channel()
         guild = client.get_guild(gid)
