@@ -24,6 +24,9 @@ if "birthdays" not in db:
 if "channel" not in db:
     db['channel'] = None
 
+if "role" not in db:
+    db['role'] = None
+
 if "events" not in db:
     db['events'] = {}
 
@@ -92,3 +95,12 @@ def set_channel(gid, cid):
 
 def get_channel():
     return db['channel']
+
+
+def set_role(gid, rid):
+    db['role'] = (gid, rid)
+    write()
+
+
+def get_role():
+    return db['role']

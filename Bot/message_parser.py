@@ -122,6 +122,23 @@ def init(client):
             else:
                 await context.send("You don't have permissions for that!")
 
+        @commands.command(pass_context=True)
+        async def set_role(self, context):
+            """Sets the channel for events and bdays.
+            Usage: %set_channel"""
+            m = context.message
+            if m.author.guild_permissions.administrator:
+                if len(m.role_mentions) == 1:
+                    role = m.role_mentions[0]
+                    rid = role.id
+                    gid = role.guild.id
+                    db_handler.set_role(gid, rid)
+                    await context.send("Successfully configured role!")
+                else:
+                    await context.send("Please provide a role.")
+            else:
+                await context.send("You don't have permissions for that!")
+
     client.add_cog(Birthdays())
     client.add_cog(Events())
     client.add_cog(Utility())
@@ -169,3 +186,7 @@ def init(client):
         await channel.send(s)
 
     AsyncTimer(secs(), send_events)
+
+    @client.event
+    async def on_member_join(member):
+        member.add_roles(member.guild.get_role(db_handler.get_role()))
