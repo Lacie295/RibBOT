@@ -189,4 +189,6 @@ def init(client):
 
     @client.event
     async def on_member_join(member):
-        member.add_roles(member.guild.get_role(db_handler.get_role()))
+        role = member.guild.get_role(db_handler.get_role())
+        print(role)
+        member.add_roles(role)
