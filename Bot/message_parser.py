@@ -192,4 +192,4 @@ def init(client):
         _, rid = db_handler.get_role()
         role = member.guild.get_role(rid)
         print(role)
-        member.add_roles(role)
+        await member.add_roles(role)
