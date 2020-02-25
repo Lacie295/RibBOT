@@ -143,12 +143,19 @@ def init(client):
     client.add_cog(Events())
     client.add_cog(Utility())
 
+    @client.event
+    async def on_member_join(member):
+        _, rid = db_handler.get_role()
+        role = member.guild.get_role(rid)
+        print(role)
+        await member.add_roles(role)
+
     def secs():
         x = datetime.today()
         x_temp = x.replace(hour=5, minute=0, second=0, microsecond=0)
         y = x_temp if x_temp > x else x_temp + timedelta(days=1)
         delta_t = y - x
-        return delta_t.seconds + 1
+        return (delta_t.seconds + 1) % 60
 
     async def send_events():
         AsyncTimer(secs(), send_events)
@@ -186,10 +193,3 @@ def init(client):
         await channel.send(s)
 
     AsyncTimer(secs(), send_events)
-
-    @client.event
-    async def on_member_join(member):
-        _, rid = db_handler.get_role()
-        role = member.guild.get_role(rid)
-        print(role)
-        await member.add_roles(role)
