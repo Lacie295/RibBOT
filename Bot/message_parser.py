@@ -61,11 +61,16 @@ def init(client):
             if m.author.guild_permissions.administrator:
                 split = m.content.split(" ")
                 if len(split) >= 3:
-                    name = " ".join(split[1:-1])
+                    if split[1] == "-o":
+                        one_time = True
+                        name = " ".join(split[2:-1])
+                    else:
+                        one_time = False
+                        name = " ".join(split[1:-1])
                     event_date = split[-1]
                     try:
                         edate = datetime.strptime(event_date, "%d/%m/%Y").date()
-                        db_handler.add_event(name, edate)
+                        db_handler.add_event(name, edate, one_time)
                         await context.send("Added event.")
                     except ValueError:
                         await context.send("Wrong date format.")
@@ -98,7 +103,7 @@ def init(client):
             if m.author.guild_permissions.administrator:
                 s = ""
                 for name in db_handler.db['events']:
-                    s += name + " - " + db_handler.get_event_date(name) + "\n"
+                    s += name + " - " + db_handler.get_event_date(name)[0] + "\n"
                 await context.send(s)
             else:
                 await context.send("You don't have permissions for that!")
@@ -168,7 +173,8 @@ def init(client):
 
         events = db_handler.get_events()
         for event in events:
-            edate = datetime.strptime(db_handler.get_event_date(event), "%d/%m/%Y").date()
+            event_info = db_handler.get_event_date(event)
+            edate = datetime.strptime(event_info[0], "%d/%m/%Y").date()
             today = date.today()
             delta = edate - today
             if delta.days == 0:
@@ -176,7 +182,7 @@ def init(client):
                 remove.append(event)
             elif delta.days < 0:
                 remove.append(event)
-            else:
+            elif not event_info[1]:
                 coming += ":star2: " + str(delta.days) + " päivää tapahtumaan: " + event + "\n"
 
         for event in remove:

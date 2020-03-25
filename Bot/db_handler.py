@@ -30,6 +30,11 @@ if "role" not in db:
 if "events" not in db:
     db['events'] = {}
 
+for event in db['events']:
+    date = db['events'][event]
+    if isinstance(date, str):
+        db['events'][event] = (date, False)
+
 
 def write():
     with open(filename, "w+") as file:
@@ -38,9 +43,9 @@ def write():
         file.close()
 
 
-def add_event(name, date):
+def add_event(name, date, one_time=False):
     datestr = str(date.day) + "/" + str(date.month) + "/" + str(date.year)
-    db['events'][name] = datestr
+    db['events'][name] = (datestr, one_time)
     write()
 
 
