@@ -157,7 +157,7 @@ def init(client):
                 role = discord.utils.get(m.guild.roles, name=name)
                 if name in db_handler.get_flairs():
                     await u.add_roles(role)
-                    await context.send("Liityit roolin {}.".format(role.name))
+                    await context.send("Liityit rooliin {}.".format(role.name))
                 else:
                     await context.send("Ei roolia nimeltä {}!".format(name))
             else:
