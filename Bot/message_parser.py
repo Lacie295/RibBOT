@@ -5,6 +5,7 @@ from asynctimer import AsyncTimer
 import db_handler
 
 from discord.ext import commands
+import discord
 from datetime import datetime, timedelta, date
 
 
@@ -144,9 +145,125 @@ def init(client):
             else:
                 await context.send("You don't have permissions for that!")
 
+    class Flairing(commands.Cog):
+        @commands.command(pass_context=True)
+        async def rank(self, context):
+            """Gives the user the requested role (if on rank list)"""
+            m = context.message
+            u = m.author
+            if m.channel.name != "giveaway":
+                pos = m.content.find(" ")
+                if pos > 0:
+                    name = m.content[pos:].strip()
+                    role = discord.utils.get(m.guild.roles, name=name)
+                    if name in db_handler.get_flairs():
+                        await u.add_roles(role)
+                        await context.send("Joined {}.".format(role.name))
+                    else:
+                        await context.send("{} is not an allowed role!".format(name))
+                else:
+                    await context.send("Please provide a name")
+
+        @commands.command(pass_context=True)
+        async def unrank(self, context):
+            """Removes requested role from user."""
+            m = context.message
+            u = m.author
+            if m.channel.name != "giveaway":
+                pos = m.content.find(" ")
+                if pos > 0:
+                    name = m.content[pos:].strip()
+                    role = discord.utils.get(m.guild.roles, name=name)
+                    if role in u.roles and name in db_handler.get_flairs():
+                        await u.remove_roles(role)
+                        await context.send("Left {}.".format(role.name))
+                    else:
+                        await context.send("{} is not an allowed role!".format(name))
+                else:
+                    await context.send("Please provide a name")
+
+        @commands.command(aliases=["create_rank"], pass_context=True)
+        async def add_rank(self, context):
+            """Adds a role to allowed ranks. If the role doesn't exist, creates it.
+            Only usable with manage roles permission."""
+            m = context.message
+            u = m.author
+            if m.channel.name != "giveaway":
+                if u.guild_permissions.manage_roles:
+                    pos = m.content.find(" ")
+                    if pos > 0:
+                        name = m.content[pos:].strip()
+                        role = discord.utils.get(m.guild.roles, name=name)
+                        if role is not None:
+                            await context.send("Added role {}.".format(role.name))
+                            db_handler.add_flair(name)
+                        else:
+                            role = await m.guild.create_role(name=name)
+                            await context.send("Created role {}.".format(role.name))
+                            db_handler.add_flair(name)
+                    else:
+                        await context.send("Please provide a name.")
+                else:
+                    await context.send("You don't have permission to use this command.")
+
+        @commands.command(pass_context=True)
+        async def remove_rank(self, context):
+            """Removes a role from allowed ranks, without deleting the role.
+            Only usable with manage roles permission."""
+            m = context.message
+            u = m.author
+            if m.channel.name != "giveaway":
+                if u.guild_permissions.manage_roles:
+                    pos = m.content.find(" ")
+                    if pos > 0:
+                        name = m.content[pos:].strip()
+                        if name in db_handler.get_flairs():
+                            await context.send("Removed role {}.".format(name))
+                            db_handler.remove_flair(name)
+                        else:
+                            await context.send("This is not a valid role.")
+                    else:
+                        await context.send("Please provide a name.")
+                else:
+                    await context.send("You don't have permission to use this command.")
+
+        @commands.command(pass_context=True)
+        async def delete_rank(self, context):
+            """Deletes a role in allowed ranks.
+            Only usable with manage roles permission."""
+            m = context.message
+            u = m.author
+            if m.channel.name != "giveaway":
+                if u.guild_permissions.manage_roles:
+                    pos = m.content.find(" ")
+                    if pos > 0:
+                        name = m.content[pos:].strip()
+                        if name in db_handler.get_flairs():
+                            role = discord.utils.get(m.guild.roles, name=name)
+                            await context.send("Deleted role {}.".format(name))
+                            db_handler.remove_flair(name)
+                            await role.delete()
+                        else:
+                            await context.send("This is not a valid role.")
+                    else:
+                        await context.send("Please provide a name.")
+                else:
+                    await context.send("You don't have permission to use this command.")
+
+        @commands.command(pass_context=True)
+        async def list_ranks(self, context):
+            """Lists all ranks."""
+            m = context.message
+            if m.channel.name != "giveaway":
+                s = ""
+                for name in db_handler.get_flairs():
+                    s += name + ":\t" + str(len(user_list(name, m.guild))) + " users\n"
+                await context.send(s.strip() if s is not "" else "No ranks yet.")
+
     client.add_cog(Birthdays())
     client.add_cog(Events())
     client.add_cog(Utility())
+    client.add_cog(Flairing())
 
     @client.event
     async def on_member_join(member):
@@ -200,3 +317,12 @@ def init(client):
         await channel.send(s)
 
     AsyncTimer(secs(), send_events)
+
+
+def user_list(name, s):
+    u_list = []
+    for member in s.members:
+        for role in member.roles:
+            if role.name == name:
+                u_list.append(member.name)
+    return u_list

@@ -10,7 +10,7 @@ dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, songs)
 if not os.path.exists(filename):
     with open(filename, "w+") as f:
-        json.dump({"birthdays": {}, "channel": None, "events": {}}, f)
+        json.dump({"birthdays": {}, "channel": None, "events": {}, "role": None, "flair": []}, f)
         f.truncate()
         f.close()
 
@@ -34,6 +34,9 @@ for event in db['events']:
     date = db['events'][event]
     if isinstance(date, str):
         db['events'][event] = (date, False)
+
+if "flair" not in db:
+    db['flair'] = []
 
 
 def write():
@@ -109,3 +112,17 @@ def set_role(gid, rid):
 
 def get_role():
     return db['role']
+
+
+def get_flairs():
+    return db['flair']
+
+
+def add_flair(name):
+    db['flair'].append(name)
+    write()
+
+
+def remove_flair(name):
+    db['flair'].remove(name)
+    write()
