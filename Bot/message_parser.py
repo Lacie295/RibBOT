@@ -268,7 +268,7 @@ def init(client):
         _, rid = db_handler.get_role()
         role = member.guild.get_role(rid)
         print(role)
-        await member.add_roles(role)
+        # await member.add_roles(role)
 
     def secs():
         x = datetime.today()
@@ -293,7 +293,7 @@ def init(client):
             today = date.today()
             delta = edate - today
             if delta.days == 0:
-                now += ":star2: Tapahtuma tänään: " + event + "\n"
+                now += ":star2: Tapahtuma tänään: " if event_info[1] else "" + event + "\n"
                 remove.append(event)
             elif delta.days < 0:
                 remove.append(event)
