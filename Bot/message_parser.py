@@ -105,7 +105,7 @@ def init(client):
                 s = ""
                 for name in db_handler.db['events']:
                     s += name + " - " + db_handler.get_event_date(name)[0] + "\n"
-                await context.send(s)
+                await context.send(s if s != "" else "No events.")
             else:
                 await context.send("You don't have permissions for that!")
 
