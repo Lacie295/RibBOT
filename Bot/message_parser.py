@@ -293,7 +293,7 @@ def init(client):
             today = date.today()
             delta = edate - today
             if delta.days == 0:
-                now += ":star2: Tapahtuma tänään: " if event_info[1] else "" + event + "\n"
+                now += (":star2: Tapahtuma tänään: " if not event_info[1] else "") + event + "\n"
                 remove.append(event)
             elif delta.days < 0:
                 remove.append(event)
